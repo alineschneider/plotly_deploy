@@ -1,11 +1,11 @@
 
 function init() {
-  var selector = d3.select("#selDataset");
+  const selector = d3.select("#selDataset");
   
   d3.json("samples.json").then((data) => {
     console.log(data);
     // Add options to index.html dropdown
-    var sampleNames = data.names;
+    const sampleNames = data.names;
     sampleNames.forEach((sample) => {
     selector
       .append("option")
@@ -14,10 +14,10 @@ function init() {
     });
 
     // Get metadata (ID 940) for Demographic Info and Gauge chart
-    var samplesArray = data.metadata.filter(sampleObj => sampleObj.id == "940");
-    var metaDict = samplesArray[0];
-    var wfreq = metaDict.wfreq;
-    var PANEL = d3.select("#sample-metadata");
+    const metaArray = data.metadata.filter(sampleObj => sampleObj.id == "940");
+    const metaDict = metaArray[0];
+    const wFreq = metaDict.wfreq;
+    const PANEL = d3.select("#sample-metadata");
   
     // Populating initial metadata for ID 940
     PANEL.html("");
@@ -29,62 +29,63 @@ function init() {
     PANEL.append("h6").text("BBTYPE: " + metaDict.bbtype);
     PANEL.append("h6").text("WFREQ: " + metaDict.wfreq);
 
+    
     // Plot gauge chart
-    var traceGauge = [{
+    const traceGauge = [{
       domain: { x: [0, 1], y: [0, 1] },
-      value: wfreq,
+      value: wFreq,
       title: { text: "Belly Button Washing Frequency" },
       type: "indicator",
       mode: "gauge+number",
     }];
   
-    var layout = { width: 600, height: 450, margin: { t: 0, b: 0 } };
+    const layoutGauge = { width: 600, height: 450, margin: { t: 0, b: 0 } };
 
-    Plotly.newPlot('gauge', traceGauge, layout);
+    Plotly.newPlot('gauge', traceGauge, layoutGauge);
 
     // Get samples data (ID 940) for horizontal and bubble bar charts
-    var resultArray = data.samples.filter(sampleObj => sampleObj.id == "940");
-    var resultDict = resultArray[0];
-    var otuIds = resultDict.otu_ids;
-    var sampleValues = resultDict.sample_values;
-    var otuLabels = resultDict.otu_labels;
+    const samplesArray = data.samples.filter(sampleObj => sampleObj.id == "940");
+    const resultDict = samplesArray[0];
+    const otuIds = resultDict.otu_ids;
+    const sampleValues = resultDict.sample_values;
+    const otuLabels = resultDict.otu_labels;
     
     // Sort values by sample_values
-    var otuSamplesList = [];
-    for (var i = 0; i < otuIds.length; i++) {
+    const otuSamplesList = [];
+    for (let i = 0; i < otuIds.length; i++) {
       otuSamplesList.push({
         'otu_IDs': "OTU " + otuIds[i], 'sample_values': sampleValues[i]
       })
     };
     
-    var sortedListDict = otuSamplesList.sort((a, b) => b.sample_values - a.sample_values);
+    const sortedListDict = otuSamplesList.sort((a, b) => b.sample_values - a.sample_values);
     
     // Get the top 10 samples and their respective OTU IDs
-    var yOtuIds = [];
-    var tenOtuIds = sortedListDict.slice(0, 10);
+    const yOtuIds = [];
+    const tenOtuIds = sortedListDict.slice(0, 10);
     tenOtuIds.forEach(dict => yOtuIds.push(dict.otu_IDs));
 
-    var xSampleValues = [];
-    var tenSampleValues = sortedListDict.slice(0, 10);
+    const xSampleValues = [];
+    const tenSampleValues = sortedListDict.slice(0, 10);
     tenSampleValues.forEach(dict => xSampleValues.push(dict.sample_values));
     
     // Plot the horizontal bar chart
-    var traceBar = [{
+    const traceBar = [{
       x: xSampleValues,
       y: yOtuIds,
       type: "bar",
       orientation: "h"
     }];
 
-    var layout = {
+    const layoutBar = {
       title: "Top 10 bacterial species (OTUs)",
     };
 
-    Plotly.newPlot("bar", traceBar, layout);
+    Plotly.newPlot("bar", traceBar, layoutBar);
 
     // Plot the bubble chart
 
-    var traceBubble = [{
+    const traceBubble = [{
       x: otuIds,
       y: sampleValues,
       text: otuLabels,
@@ -96,13 +97,13 @@ function init() {
       }
     }];
     
-    var layout = {
+    const layoutBubble = {
       showlegend: false,
       height: 600,
       width: 1100
     };
     
-    Plotly.newPlot('bubble', traceBubble, layout);
+    Plotly.newPlot('bubble', traceBubble, layoutBubble);
 
   });
 
@@ -120,9 +121,9 @@ function buildMetadata(sample) {
   d3.json("samples.json").then((data) => {
 
     // Get metadata (ID 940) for Demographic Info and Gauge chart
-    var samplesArray = data.metadata.filter(sampleObj => sampleObj.id == sample);
-    var metaDict = samplesArray[0];
-    var PANEL = d3.select("#sample-metadata");
+    const metaArray = data.metadata.filter(sampleObj => sampleObj.id == sample);
+    const metaDict = metaArray[0];
+    const PANEL = d3.select("#sample-metadata");
   
     PANEL.html("");
     PANEL.append("h6").text("ID: " + metaDict.id);
@@ -140,37 +141,37 @@ function buildCharts(sample) {
   d3.json("samples.json").then((data) => {
     
     // Get samples data matching ID selected from the dropdown for horizontal and bubble bar charts
-    var samplesArray = data.samples.filter(sampleObj => sampleObj.id == sample);
-    var samplesDict = samplesArray[0];
-    var otuIds = samplesDict.otu_ids;
-    var sampleValues = samplesDict.sample_values;
-    var otuLabels = samplesDict.otu_labels;
+    const samplesArray = data.samples.filter(sampleObj => sampleObj.id == sample);
+    const samplesDict = samplesArray[0];
+    const otuIds = samplesDict.otu_ids;
+    const sampleValues = samplesDict.sample_values;
+    const otuLabels = samplesDict.otu_labels;
 
-    var metaArray = data.metadata.filter(sampleObj => sampleObj.id == sample);
-    var metaDict = metaArray[0];
-    var wfreq = metaDict.wfreq;
+    const metaArray = data.metadata.filter(sampleObj => sampleObj.id == sample);
+    const metaDict = metaArray[0];
+    const wFreq = metaDict.wfreq;
     
     // Sort values by sample_values
-    var otuSamplesList = [];
-    for (var i = 0; i < otuIds.length; i++) {
+    const otuSamplesList = [];
+    for (let i = 0; i < otuIds.length; i++) {
       otuSamplesList.push({
         'otu_IDs': "OTU " + otuIds[i], 'sample_values': sampleValues[i]
       })
     };
     
-    var sortedListDict = otuSamplesList.sort((a, b) => b.sample_values - a.sample_values);
+    const sortedListDict = otuSamplesList.sort((a, b) => b.sample_values - a.sample_values);
     
     // Get the top 10 samples and their respective OTU IDs
-    var yOtuIds = [];
-    var tenOtuIds = sortedListDict.slice(0, 10);
+    const yOtuIds = [];
+    const tenOtuIds = sortedListDict.slice(0, 10);
     tenOtuIds.forEach(dict => yOtuIds.push(dict.otu_IDs));
 
-    var xSampleValues = [];
-    var tenSampleValues = sortedListDict.slice(0, 10);
+    const xSampleValues = [];
+    const tenSampleValues = sortedListDict.slice(0, 10);
     tenSampleValues.forEach(dict => xSampleValues.push(dict.sample_values));
     
     // Restyle the horizontal bar chart
-    var updateBar = {
+    const updateBar = {
       x: [xSampleValues],
       y: [yOtuIds]
     };
@@ -178,7 +179,7 @@ function buildCharts(sample) {
     Plotly.restyle("bar", updateBar);
 
     // Restyle the bubble chart
-    var updateBubble = {
+    const updateBubble = {
       x: [otuIds],
       y: [sampleValues],
       text: [otuLabels],
@@ -192,8 +193,8 @@ function buildCharts(sample) {
     Plotly.restyle('bubble', updateBubble);
 
     // Restyle gauge chart
-    var updateGauge = {
-      value: [wfreq]
+    const updateGauge = {
+      value: [wFreq]
     };
   
     Plotly.restyle('gauge', updateGauge);
